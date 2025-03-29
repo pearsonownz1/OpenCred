@@ -10,9 +10,11 @@ dotenv.config();
 const app = express();
 const port = parseInt(process.env.PORT || '3001');
 
-// Enable CORS for development
+// Enable CORS for development and production
 app.use(cors({
-  origin: process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : process.env.FRONTEND_URL,
+  origin: process.env.NODE_ENV === 'development' 
+    ? ['http://localhost:5173', 'http://localhost:5174']
+    : ['https://openeval.co', 'https://www.openeval.co'],
   credentials: true,
 }));
 
