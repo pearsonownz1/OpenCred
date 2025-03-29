@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import DocumentList from "@/components/dashboard/documents/DocumentList";
-import DocumentUploader from "@/components/dashboard/documents/DocumentUploader";
+import { DocumentUploader } from "@/components/dashboard/documents/DocumentUploader";
 import DocumentViewer from "@/components/dashboard/documents/DocumentViewer";
 import { Plus, Upload, FileText } from "lucide-react";
+import { Card } from 'antd';
+import DocumentEvaluation from '@/components/dashboard/documents/DocumentEvaluation';
+import EvaluationResults from '@/components/dashboard/documents/EvaluationResults';
 
 interface DocumentsPageProps {
   studentId?: string;
@@ -15,8 +18,12 @@ const DocumentsPage = ({ studentId }: DocumentsPageProps) => {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [showUploader, setShowUploader] = useState(false);
   const [showViewer, setShowViewer] = useState(false);
+  const [currentDocument, setCurrentDocument] = useState<any>(null);
+  const [evaluationResult, setEvaluationResult] = useState<any>(null);
 
-  const handleUploadComplete = () => {
+  const handleUploadComplete = (document: any) => {
+    setCurrentDocument(document);
+    setEvaluationResult(null);
     setShowUploader(false);
     setActiveTab("all-documents");
     // In a real app, you would refresh the document list here
@@ -30,6 +37,10 @@ const DocumentsPage = ({ studentId }: DocumentsPageProps) => {
   const handleCloseViewer = () => {
     setShowViewer(false);
     setSelectedDocument(null);
+  };
+
+  const handleEvaluationComplete = (result: any) => {
+    setEvaluationResult(result);
   };
 
   return (
@@ -139,6 +150,31 @@ const DocumentsPage = ({ studentId }: DocumentsPageProps) => {
           onShare={(id) => console.log(`Sharing document ${id}`)}
         />
       )}
+
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-6">Document Evaluation</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <DocumentUploader onUploadComplete={handleUploadComplete} />
+            
+            {currentDocument && (
+              <DocumentEvaluation
+                documentId={currentDocument.id}
+                evaluationId={currentDocument.evaluationId}
+                documentType={currentDocument.type}
+                onEvaluationComplete={handleEvaluationComplete}
+              />
+            )}
+          </div>
+
+          <div>
+            {evaluationResult && (
+              <EvaluationResults result={evaluationResult} />
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

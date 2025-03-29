@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id          String       @id @default(uuid())
+  name        String
+  email       String       @unique
+  evaluations Evaluation[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Document {
+  id           String     @id @default(uuid())
+  filename     String
+  originalName String
+  path         String
+  type         String
+  mimetype     String
+  size         Int
+  parsedData   Json?
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Evaluation {
+  id             String     @id @default(uuid())
+  studentId      String
+  student        Student    @relation(fields: [studentId], references: [id])
+  status         String
+  evaluationType String
+  institution    String
+  country        String
+  program        String
+  result         Json?
+  error          String?    // Store error message if evaluation fails
+  documents      Document[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model CountryRules {
+  id        String   @id @default(uuid())
+  country   String   @unique
+  rules     String   // JSON string containing education system rules
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

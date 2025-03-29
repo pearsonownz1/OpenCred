@@ -1,337 +1,217 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { FileUp, Plus, Trash2 } from "lucide-react";
-
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/select';
+import { DocumentUploader } from '../documents/DocumentUploader';
+import { uploadDocument } from '@/services/documentService';
 
-const formSchema = z.object({
-  studentId: z.string().min(1, { message: "Student is required" }),
-  evaluationType: z.string().min(1, { message: "Evaluation type is required" }),
-  institution: z.string().min(1, { message: "Institution is required" }),
-  country: z.string().min(1, { message: "Country is required" }),
-  program: z.string().min(1, { message: "Program is required" }),
-  documents: z
-    .array(z.string())
-    .min(1, { message: "At least one document is required" }),
-  notes: z.string().optional(),
-});
-
-type EvaluationFormValues = z.infer<typeof formSchema>;
-
-interface EvaluationFormProps {
-  onSubmit?: (values: EvaluationFormValues) => void;
-  initialData?: Partial<EvaluationFormValues>;
+interface DocumentData {
+  type: 'diploma' | 'transcript';
+  file: File;
+  parsedData?: any;
+  evaluation?: any;
 }
 
-const EvaluationForm = ({
-  onSubmit = () => {},
-  initialData = {
-    studentId: "",
-    evaluationType: "",
-    institution: "",
-    country: "",
-    program: "",
-    documents: [],
-    notes: "",
-  },
-}: EvaluationFormProps) => {
-  const form = useForm<EvaluationFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+export default function EvaluationForm() {
+  const [documents, setDocuments] = useState<DocumentData[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [formData, setFormData] = useState({
+    student: '',
+    evaluationType: 'Document-by-Document',
+    institution: '',
+    country: '',
+    program: '',
+    additionalNotes: '',
   });
 
-  const [selectedDocuments, setSelectedDocuments] = React.useState<string[]>(
-    initialData.documents || [],
-  );
+  const handleDocumentUpload = async (type: 'diploma' | 'transcript', file: File) => {
+    setIsProcessing(true);
+    try {
+      // Upload the document
+      const uploadedFile = await uploadDocument(file);
+      
+      // Call OpenAI to parse the document
+      const parsedData = await fetch('/api/parse-document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          documentType: type,
+          filePath: uploadedFile.path
+        })
+      }).then(res => res.json());
 
-  const handleSubmit = (values: EvaluationFormValues) => {
-    onSubmit(values);
-  };
+      // Get US equivalency evaluation
+      const evaluation = await fetch('/api/evaluate-document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          documentType: type,
+          parsedData
+        })
+      }).then(res => res.json());
 
-  const handleAddDocument = () => {
-    // In a real implementation, this would open a document selector
-    // For now, we'll just add a placeholder document
-    const newDocument = `Document-${Math.floor(Math.random() * 1000)}`;
-    setSelectedDocuments([...selectedDocuments, newDocument]);
-    form.setValue("documents", [...selectedDocuments, newDocument]);
-  };
+      setDocuments(prev => [...prev, {
+        type,
+        file,
+        parsedData,
+        evaluation
+      }]);
 
-  const handleRemoveDocument = (index: number) => {
-    const updatedDocuments = [...selectedDocuments];
-    updatedDocuments.splice(index, 1);
-    setSelectedDocuments(updatedDocuments);
-    form.setValue("documents", updatedDocuments);
+      // Auto-fill form data based on parsed information
+      if (parsedData) {
+        setFormData(prev => ({
+          ...prev,
+          institution: parsedData.institution || prev.institution,
+          program: parsedData.program || prev.program,
+          country: parsedData.country || prev.country,
+        }));
+      }
+    } catch (error) {
+      console.error('Error processing document:', error);
+      // Handle error appropriately
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-white">
-      <CardHeader>
-        <CardTitle>New Credential Evaluation</CardTitle>
-        <CardDescription>
-          Select a student and documents to initiate a new credential
-          evaluation.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="studentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Student</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a student" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="student-1">John Doe</SelectItem>
-                        <SelectItem value="student-2">Jane Smith</SelectItem>
-                        <SelectItem value="student-3">Alex Johnson</SelectItem>
-                        <SelectItem value="student-4">Maria Garcia</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Select the student for this evaluation.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="space-y-6 p-6">
+      <div>
+        <h2 className="text-lg font-semibold mb-2">New Credential Evaluation</h2>
+        <p className="text-sm text-muted-foreground">
+          Upload and analyze academic documents for evaluation
+        </p>
+      </div>
 
-              <FormField
-                control={form.control}
-                name="evaluationType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Evaluation Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select evaluation type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="course-by-course">
-                          Course-by-Course
-                        </SelectItem>
-                        <SelectItem value="document-by-document">
-                          Document-by-Document
-                        </SelectItem>
-                        <SelectItem value="degree-equivalency">
-                          Degree Equivalency
-                        </SelectItem>
-                        <SelectItem value="professional-license">
-                          Professional License
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Type of evaluation to be performed.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="institution"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Institution</FormLabel>
-                    <FormControl>
-                      <Input placeholder="University name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      The institution that issued the credential.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="uk">United Kingdom</SelectItem>
-                        <SelectItem value="india">India</SelectItem>
-                        <SelectItem value="china">China</SelectItem>
-                        <SelectItem value="germany">Germany</SelectItem>
-                        <SelectItem value="france">France</SelectItem>
-                        <SelectItem value="brazil">Brazil</SelectItem>
-                        <SelectItem value="nigeria">Nigeria</SelectItem>
-                        <SelectItem value="canada">Canada</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Country where the credential was issued.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="program"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Program/Degree</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Bachelor of Science" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      The program or degree earned.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <Label>Diploma</Label>
+          <DocumentUploader
+            onUploadComplete={(files) => {
+              if (files[0]) handleDocumentUpload('diploma', files[0]);
+            }}
+            acceptedFileTypes={['.pdf', '.jpg', '.jpeg', '.png']}
+            maxFiles={1}
+          />
+          {documents.find(d => d.type === 'diploma')?.parsedData && (
+            <div className="p-4 bg-muted rounded-lg">
+              <h3 className="font-medium mb-2">Parsed Information</h3>
+              <pre className="text-sm">
+                {JSON.stringify(documents.find(d => d.type === 'diploma')?.parsedData, null, 2)}
+              </pre>
             </div>
+          )}
+        </div>
 
-            <div className="space-y-4">
-              <div>
-                <FormLabel>Documents</FormLabel>
-                <FormDescription className="mt-1 mb-3">
-                  Select documents for evaluation. Upload new documents or
-                  choose from existing ones.
-                </FormDescription>
+        <div className="space-y-4">
+          <Label>Transcript</Label>
+          <DocumentUploader
+            onUploadComplete={(files) => {
+              if (files[0]) handleDocumentUpload('transcript', files[0]);
+            }}
+            acceptedFileTypes={['.pdf', '.jpg', '.jpeg', '.png']}
+            maxFiles={1}
+          />
+          {documents.find(d => d.type === 'transcript')?.parsedData && (
+            <div className="p-4 bg-muted rounded-lg">
+              <h3 className="font-medium mb-2">Parsed Information</h3>
+              <pre className="text-sm">
+                {JSON.stringify(documents.find(d => d.type === 'transcript')?.parsedData, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+      </div>
 
-                <div className="flex flex-col gap-2">
-                  {selectedDocuments.length > 0 ? (
-                    <div className="space-y-2">
-                      {selectedDocuments.map((doc, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 border rounded-md bg-gray-50"
-                        >
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 text-blue-500" />
-                            <span>{doc}</span>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveDocument(index)}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center p-6 border border-dashed rounded-md">
-                      <p className="text-muted-foreground text-sm">
-                        No documents selected
-                      </p>
-                    </div>
-                  )}
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <Label>Institution</Label>
+            <Input
+              value={formData.institution}
+              onChange={(e) => setFormData(prev => ({ ...prev, institution: e.target.value }))}
+              placeholder="University name"
+            />
+          </div>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="mt-2"
-                    onClick={handleAddDocument}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Document
-                  </Button>
-                </div>
-                {form.formState.errors.documents && (
-                  <p className="text-[0.8rem] font-medium text-destructive mt-2">
-                    {form.formState.errors.documents.message}
-                  </p>
-                )}
+          <div>
+            <Label>Program/Degree</Label>
+            <Input
+              value={formData.program}
+              onChange={(e) => setFormData(prev => ({ ...prev, program: e.target.value }))}
+              placeholder="Bachelor of Science"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label>Country</Label>
+            <Input
+              value={formData.country}
+              onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
+              placeholder="Select country"
+            />
+          </div>
+
+          <div>
+            <Label>Evaluation Type</Label>
+            <Select
+              value={formData.evaluationType}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, evaluationType: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Document-by-Document">Document-by-Document</SelectItem>
+                <SelectItem value="Course-by-Course">Course-by-Course</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <Label>Additional Notes</Label>
+        <Textarea
+          value={formData.additionalNotes}
+          onChange={(e) => setFormData(prev => ({ ...prev, additionalNotes: e.target.value }))}
+          placeholder="Any additional information or special instructions"
+          className="h-32"
+        />
+      </div>
+
+      {documents.some(d => d.evaluation) && (
+        <div className="p-4 bg-muted rounded-lg">
+          <h3 className="font-medium mb-2">US Equivalency Evaluation</h3>
+          <div className="space-y-4">
+            {documents.map((doc, index) => doc.evaluation && (
+              <div key={index}>
+                <h4 className="font-medium">{doc.type.charAt(0).toUpperCase() + doc.type.slice(1)}</h4>
+                <pre className="text-sm mt-2">
+                  {JSON.stringify(doc.evaluation, null, 2)}
+                </pre>
               </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Additional Notes</FormLabel>
-                    <FormControl>
-                      <textarea
-                        className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[100px]"
-                        placeholder="Any additional information or special instructions"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Optional notes for the evaluation process.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <CardFooter className="px-0 pt-6 flex justify-end gap-2">
-              <Button type="button" variant="outline">
-                Cancel
-              </Button>
-              <Button type="submit">Submit for Evaluation</Button>
-            </CardFooter>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+      <div className="flex justify-end gap-3">
+        <Button variant="outline">Cancel</Button>
+        <Button disabled={isProcessing || documents.length === 0}>
+          {isProcessing ? 'Processing...' : 'Submit Evaluation'}
+        </Button>
+      </div>
+    </div>
   );
-};
-
-export default EvaluationForm;
+}

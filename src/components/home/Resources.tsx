@@ -56,7 +56,7 @@ const Resources = () => {
       icon: <Book className="h-8 w-8 text-primary" />,
       title: "Documentation",
       description:
-        "Comprehensive guides on how to use OpenCred for credential evaluations.",
+        "Comprehensive guides on how to use OpenEval for credential evaluations.",
       linkText: "View Documentation",
       linkUrl: "/docs",
     },
@@ -83,7 +83,7 @@ const Resources = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Resources</h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Access helpful resources to make the most of the OpenCred platform
+            Access helpful resources to make the most of the OpenEval platform
             for your credential evaluation needs.
           </p>
         </div>

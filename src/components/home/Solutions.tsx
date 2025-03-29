@@ -45,7 +45,7 @@ interface SolutionsProps {
 
 const Solutions = ({
   title = "Solutions for Every Institution",
-  subtitle = "OpenCred provides specialized credential evaluation solutions tailored to your organization's needs.",
+  subtitle = "OpenEval provides specialized credential evaluation solutions tailored to your organization's needs.",
   solutions = [
     {
       icon: <GraduationCap size={24} />,

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,7 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
+import EvaluationForm from "./EvaluationForm";
 
 type EvaluationStatus = "pending" | "in-progress" | "completed" | "rejected";
 
@@ -80,6 +82,13 @@ const EvaluationList = ({
   const [statusFilter, setStatusFilter] = useState<EvaluationStatus | "all">(
     "all",
   );
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleFormSubmit = (values: any) => {
+    // In a real implementation, this would submit the form data to the server
+    console.log("Form submitted:", values);
+    setIsFormOpen(false);
+  };
 
   const filteredEvaluations = evaluations.filter((evaluation) => {
     const matchesSearch =
@@ -100,7 +109,7 @@ const EvaluationList = ({
     <div className="w-full space-y-4 bg-white p-6 rounded-lg shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Evaluation Requests</h2>
-        <Button>
+        <Button onClick={() => setIsFormOpen(true)}>
           <FileText className="mr-2 h-4 w-4" />
           New Evaluation
         </Button>
@@ -229,6 +238,16 @@ const EvaluationList = ({
           </TableBody>
         </Table>
       </div>
+
+      {/* New Evaluation Form Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 my-4">
+          <EvaluationForm 
+            onSubmit={handleFormSubmit} 
+            onCancel={() => setIsFormOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

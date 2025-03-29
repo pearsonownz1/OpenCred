@@ -87,7 +87,7 @@ const Features = () => {
             Powerful Features for Modern Credential Evaluation
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            OpenCred combines cutting-edge technology with intuitive design to
+            OpenEval combines cutting-edge technology with intuitive design to
             streamline your credential evaluation process.
           </p>
         </div>

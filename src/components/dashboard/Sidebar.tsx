@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/logo";
 import {
   Tooltip,
   TooltipContent,
@@ -43,10 +44,10 @@ const NavItem = ({
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start gap-3 px-3 py-2 h-10",
+                "w-full justify-start gap-3 px-3 py-2 h-10 text-white/80",
                 isActive
-                  ? "bg-accent text-accent-foreground"
-                  : "hover:bg-accent hover:text-accent-foreground",
+                  ? "bg-white/10 text-white"
+                  : "hover:bg-white/10 hover:text-white",
                 isCollapsed && "justify-center px-2",
               )}
             >
@@ -103,39 +104,36 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
     },
   ];
 
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
-    <aside
+    <div
       className={cn(
-        "flex flex-col h-screen bg-background border-r transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-16" : "w-64",
-        className,
+        "flex flex-col h-screen bg-primary border-r border-white/10 transition-all duration-300",
+        isCollapsed ? "w-[60px]" : "w-[220px]"
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b">
-        {!isCollapsed && (
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">OC</span>
-            </div>
-            <span className="font-semibold text-lg">OpenCred</span>
-          </div>
-        )}
-        {isCollapsed && (
-          <div className="h-8 w-8 mx-auto rounded-md bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold">OC</span>
-          </div>
-        )}
+      <div className="flex items-center justify-between p-3">
+        <Link to="/dashboard" className="flex items-center">
+          <Logo className={cn("text-white", isCollapsed ? "scale-75" : "")} />
+        </Link>
         <Button
           variant="ghost"
           size="icon"
-          className={cn("ml-auto", isCollapsed && "mx-auto mt-2")}
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="text-white hover:bg-white/10"
+          onClick={toggleCollapse}
         >
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
-      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
+      <nav className="flex-1 py-2 px-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => (
           <NavItem
             key={item.path}
@@ -151,14 +149,14 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
         ))}
       </nav>
 
-      <div className="p-4 border-t">
+      <div className="p-2 border-t border-white/10">
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-3 text-red-500 hover:text-red-600 hover:bg-red-50",
+                  "w-full justify-start gap-3 text-white/80 hover:text-white hover:bg-white/10",
                   isCollapsed && "justify-center px-2",
                 )}
               >
@@ -172,7 +170,7 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
           </Tooltip>
         </TooltipProvider>
       </div>
-    </aside>
+    </div>
   );
 };
 

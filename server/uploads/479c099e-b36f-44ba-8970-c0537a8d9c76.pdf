@@ -1,0 +1,60 @@
+UNIVERSITY OF SAMPLE
+Transcript of Academic Record
+
+Student Name: John Doe
+Student ID: 12345
+Program: Bachelor of Science in Computer Science
+Duration: 2019-2023
+
+Semester 1 (Fall 2019)
+Course Code    Course Name                    Credits    Grade
+CS101         Introduction to Programming     3          A
+MATH101       Calculus I                     4          B+
+PHY101        Physics I                      4          A-
+
+Semester 2 (Spring 2020)
+Course Code    Course Name                    Credits    Grade
+CS102         Data Structures                 3          A
+MATH102       Calculus II                    4          B
+PHY102        Physics II                     4          A
+
+Semester 3 (Fall 2020)
+Course Code    Course Name                    Credits    Grade
+CS201         Algorithms                      3          A+
+MATH201       Linear Algebra                 3          B+
+CS202         Database Systems               3          A
+
+Semester 4 (Spring 2021)
+Course Code    Course Name                    Credits    Grade
+CS301         Software Engineering           3          A
+MATH301       Probability                    3          B
+CS302         Computer Networks              3          A-
+
+Semester 5 (Fall 2021)
+Course Code    Course Name                    Credits    Grade
+CS401         Operating Systems              3          B+
+CS402         Machine Learning               3          A
+CS403         Cloud Computing                3          A
+
+Semester 6 (Spring 2022)
+Course Code    Course Name                    Credits    Grade
+CS501         Capstone Project               6          A
+CS502         Advanced Algorithms            3          A-
+CS503         Security                       3          B+
+
+Semester 7 (Fall 2022)
+Course Code    Course Name                    Credits    Grade
+CS601         Distributed Systems            3          A
+CS602         Big Data                       3          A-
+CS603         Blockchain                     3          B+
+
+Semester 8 (Spring 2023)
+Course Code    Course Name                    Credits    Grade
+CS701         Advanced Topics                3          A
+CS702         Research Project               3          A
+CS703         Industry Internship            3          A-
+
+Cumulative GPA: 3.75/4.00
+Total Credits: 96
+Program Duration: 4 years
+Date of Issue: March 20, 2024 

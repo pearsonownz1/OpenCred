@@ -103,9 +103,9 @@ const AuthModal = ({
           </DialogTitle>
           <DialogDescription className="text-center mb-4">
             {activeTab === "signIn"
-              ? "Sign in to access your OpenCred account"
+              ? "Sign in to access your OpenEval account"
               : activeTab === "signUp"
-                ? "Join OpenCred to start evaluating credentials"
+                ? "Join OpenEval to start evaluating credentials"
                 : "We sent a verification link to your email"}
           </DialogDescription>
         </DialogHeader>

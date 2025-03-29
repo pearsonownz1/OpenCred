@@ -1,0 +1,69 @@
+{
+  "institution": "University of Mumbai",
+  "studentName": "Raj Patel",
+  "degree": "Bachelor of Engineering",
+  "major": "Computer Science",
+  "graduationDate": "2023-05-15",
+  "academicPeriod": "2019-2023",
+  "gpa": "8.5",
+  "courses": [
+    {
+      "name": "Data Structures and Algorithms",
+      "code": "CS201",
+      "credits": 4,
+      "grade": "85",
+      "semester": "Fall 2019"
+    },
+    {
+      "name": "Database Management Systems",
+      "code": "CS302",
+      "credits": 4,
+      "grade": "90",
+      "semester": "Spring 2020"
+    },
+    {
+      "name": "Operating Systems",
+      "code": "CS303",
+      "credits": 4,
+      "grade": "88",
+      "semester": "Fall 2020"
+    },
+    {
+      "name": "Computer Networks",
+      "code": "CS304",
+      "credits": 4,
+      "grade": "82",
+      "semester": "Spring 2021"
+    },
+    {
+      "name": "Software Engineering",
+      "code": "CS401",
+      "credits": 4,
+      "grade": "87",
+      "semester": "Fall 2021"
+    },
+    {
+      "name": "Machine Learning",
+      "code": "CS402",
+      "credits": 4,
+      "grade": "92",
+      "semester": "Spring 2022"
+    },
+    {
+      "name": "Cloud Computing",
+      "code": "CS403",
+      "credits": 4,
+      "grade": "89",
+      "semester": "Fall 2022"
+    },
+    {
+      "name": "Artificial Intelligence",
+      "code": "CS404",
+      "credits": 4,
+      "grade": "91",
+      "semester": "Spring 2023"
+    }
+  ],
+  "honors": "First Class with Distinction",
+  "additionalNotes": "Completed with outstanding academic performance"
+} 

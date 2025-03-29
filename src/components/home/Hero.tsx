@@ -13,7 +13,7 @@ interface HeroProps {
 
 const Hero = ({
   title = "Transform Your Credential Evaluation Process",
-  subtitle = "OpenCred empowers universities and law firms with AI-powered international credential evaluations, providing accurate US equivalency assessments in minutes, not weeks.",
+  subtitle = "OpenEval empowers universities and law firms with AI-powered international credential evaluations, providing accurate US equivalency assessments in minutes, not weeks.",
   primaryCTA = "Get Started",
   secondaryCTA = "Learn More",
   features = [
@@ -38,13 +38,6 @@ const Hero = ({
           <div className="flex flex-wrap gap-4">
             <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
               {primaryCTA} <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-indigo-600 text-indigo-600 hover:bg-indigo-50"
-            >
-              {secondaryCTA}
             </Button>
             <Button
               size="lg"
@@ -79,7 +72,7 @@ const Hero = ({
             <div className="overflow-hidden">
               <img
                 src="/dashboard-screenshot.png"
-                alt="OpenCred Dashboard Interface"
+                alt="OpenEval Dashboard Interface"
                 className="w-full h-auto object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;

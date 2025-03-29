@@ -165,7 +165,7 @@ const EvaluationsPage = () => {
 
       {/* New Evaluation Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-4xl p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 my-4">
           <EvaluationForm onSubmit={handleFormSubmit} />
         </DialogContent>
       </Dialog>

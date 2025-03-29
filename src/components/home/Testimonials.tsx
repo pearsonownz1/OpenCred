@@ -20,7 +20,7 @@ interface TestimonialProps {
 }
 
 const Testimonial = ({
-  quote = "OpenCred has transformed how we evaluate international credentials. The AI-powered analysis saves us countless hours and provides consistent results.",
+  quote = "OpenEval has transformed how we evaluate international credentials. The AI-powered analysis saves us countless hours and provides consistent results.",
   author = "Jane Smith",
   role = "Admissions Director",
   institution = "State University",
@@ -72,7 +72,7 @@ const Testimonials = () => {
   const testimonials: TestimonialProps[] = [
     {
       quote:
-        "OpenCred has transformed how we evaluate international credentials. The AI-powered analysis saves us countless hours and provides consistent results.",
+        "OpenEval has transformed how we evaluate international credentials. The AI-powered analysis saves us countless hours and provides consistent results.",
       author: "Jane Smith",
       role: "Admissions Director",
       institution: "State University",
@@ -90,7 +90,7 @@ const Testimonials = () => {
     },
     {
       quote:
-        "We've reduced our credential evaluation time by 75% since implementing OpenCred. The accuracy of the AI analysis is impressive and has helped us make better admissions decisions.",
+        "We've reduced our credential evaluation time by 75% since implementing OpenEval. The accuracy of the AI analysis is impressive and has helped us make better admissions decisions.",
       author: "Sarah Williams",
       role: "International Student Coordinator",
       institution: "Tech Institute",
@@ -99,7 +99,7 @@ const Testimonials = () => {
     },
     {
       quote:
-        "OpenCred provides detailed equivalency reports that are easy to understand and share with our admissions committee. The collaborative tools have streamlined our entire workflow.",
+        "OpenEval provides detailed equivalency reports that are easy to understand and share with our admissions committee. The collaborative tools have streamlined our entire workflow.",
       author: "David Chen",
       role: "Managing Partner",
       institution: "Global Legal Associates",
@@ -108,7 +108,7 @@ const Testimonials = () => {
     },
     {
       quote:
-        "The security features give us peace of mind when handling sensitive student documents. OpenCred has thought of everything an institution needs for credential evaluation.",
+        "The security features give us peace of mind when handling sensitive student documents. OpenEval has thought of everything an institution needs for credential evaluation.",
       author: "Emily Rodriguez",
       role: "Registrar",
       institution: "Metropolitan University",

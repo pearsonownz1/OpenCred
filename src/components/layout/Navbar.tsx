@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,11 +28,8 @@ const Navbar = ({ showAuthModal = () => {} }: NavbarProps) => {
     <nav className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
       <div className="container flex items-center justify-between h-20 px-4 mx-auto">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center">
-            <span className="text-white font-bold text-xl">OC</span>
-          </div>
-          <span className="text-xl font-bold text-primary">OpenCred</span>
+        <Link to="/">
+          <Logo className="text-2xl" />
         </Link>
 
         {/* Desktop Navigation */}

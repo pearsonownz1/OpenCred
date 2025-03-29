@@ -11,7 +11,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">OpenCred</h3>
+            <h3 className="text-xl font-bold mb-4">OpenEval</h3>
             <p className="text-slate-300 text-sm">
               Modern credential evaluation platform for universities and law
               firms.
@@ -135,7 +135,7 @@ const Footer = () => {
 
         <div className="border-t border-slate-700 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-slate-400 mb-4 md:mb-0">
-            &copy; {currentYear} OpenCred. All rights reserved.
+            &copy; {currentYear} OpenEval. All rights reserved.
           </p>
 
           <div className="flex space-x-4">

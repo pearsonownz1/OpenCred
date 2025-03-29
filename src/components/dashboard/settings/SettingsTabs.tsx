@@ -287,12 +287,7 @@ const SettingsTabs = ({ activeTab = "profile" }: SettingsTabsProps) => {
                         <div>
                           <Badge
                             variant={
-                              user.status === "Active" ? "success" : "warning"
-                            }
-                            className={
-                              user.status === "Active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
+                              user.status === "Active" ? "secondary" : "outline"
                             }
                           >
                             {user.status}
@@ -495,7 +490,7 @@ const SettingsTabs = ({ activeTab = "profile" }: SettingsTabsProps) => {
                     id: "system-updates",
                     title: "System updates",
                     description:
-                      "Important updates about the OpenCred platform",
+                      "Important updates about the OpenEval platform",
                   },
                 ].map((item) => (
                   <div
