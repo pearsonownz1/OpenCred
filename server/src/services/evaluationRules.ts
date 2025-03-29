@@ -196,7 +196,7 @@ function evaluateDiploma(parsedData: any, rules: EducationSystem) {
 }
 
 export async function updateCountryRules(country: string, updates: any) {
-  return prisma.countryRule.upsert({
+  return prisma.countryRules.upsert({
     where: { country },
     update: updates,
     create: {

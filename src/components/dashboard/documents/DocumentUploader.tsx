@@ -7,40 +7,50 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface DocumentUploaderProps {
   studentId?: string;
-  onUploadComplete?: (document: any) => void;
+  onUploadComplete: (files: File[]) => void;
+  maxFiles?: number;
+  acceptedFileTypes?: string[];
 }
 
-export const DocumentUploader: React.FC<DocumentUploaderProps> = ({ studentId, onUploadComplete }) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+export function DocumentUploader({
+  studentId,
+  onUploadComplete,
+  maxFiles = 1,
+  acceptedFileTypes = ['.pdf', '.jpg', '.jpeg', '.png']
+}: DocumentUploaderProps) {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      console.log('File selected:', file);
-      setSelectedFile(file);
+    const files = event.target.files;
+    if (files) {
+      console.log('Files selected:', files);
+      setSelectedFiles(Array.from(files));
     }
   };
 
-  const handleRemoveFile = () => {
-    setSelectedFile(null);
+  const handleRemoveFile = (index: number) => {
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    setSelectedFiles(newFiles);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (selectedFiles.length === 0) return;
 
     console.log('Starting upload process...');
     const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('type', 'transcript');
-    if (studentId) {
-      formData.append('studentId', studentId);
-    }
+    selectedFiles.forEach((file, index) => {
+      formData.append('file', file);
+      formData.append('type', 'transcript');
+      if (studentId) {
+        formData.append('studentId', studentId);
+      }
+    });
 
     setUploading(true);
 
@@ -64,17 +74,17 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({ studentId, o
 
       toast({
         title: "Success",
-        description: "Document uploaded successfully",
+        description: "Documents uploaded successfully",
       });
 
-      setSelectedFile(null);
+      setSelectedFiles([]);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
       
       if (onUploadComplete) {
-        console.log('Calling onUploadComplete with document:', result.document);
-        onUploadComplete(result.document);
+        console.log('Calling onUploadComplete with documents:', result.documents);
+        onUploadComplete(result.documents);
       }
     } catch (error) {
       console.error('Upload error:', error);
@@ -95,11 +105,12 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({ studentId, o
           type="file"
           ref={fileInputRef}
           onChange={handleFileSelect}
-          accept=".pdf,.jpg,.jpeg,.png"
+          accept={acceptedFileTypes.join(',')}
           className="hidden"
+          multiple
         />
         
-        {!selectedFile ? (
+        {!selectedFiles.length ? (
           <Button 
             onClick={() => fileInputRef.current?.click()}
             variant="outline"
@@ -109,7 +120,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({ studentId, o
             <div className="flex flex-col items-center">
               <span className="font-semibold">Click to upload</span>
               <span className="text-sm text-muted-foreground">
-                PDF, JPG or PNG (max. 10MB)
+                {acceptedFileTypes.map(type => `${type} (max. 10MB)`).join(', ')}
               </span>
             </div>
           </Button>
@@ -117,19 +128,19 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({ studentId, o
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
-              <span className="text-sm font-medium">{selectedFile.name}</span>
+              <span className="text-sm font-medium">{selectedFiles.map(file => file.name).join(', ')}</span>
             </div>
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleRemoveFile}
+              onClick={() => selectedFiles.forEach((_, index) => handleRemoveFile(index))}
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
         )}
 
-        {selectedFile && (
+        {selectedFiles.length > 0 && (
           <Button
             onClick={handleUpload}
             disabled={uploading}
@@ -146,7 +157,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({ studentId, o
             ) : (
               <span className="flex items-center gap-2">
                 <Upload className="h-4 w-4" />
-                Upload Document
+                Upload Documents
               </span>
             )}
           </Button>
@@ -154,4 +165,4 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({ studentId, o
       </div>
     </div>
   );
-};
+}

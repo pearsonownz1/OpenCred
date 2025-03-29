@@ -11,6 +11,8 @@ interface Message {
   timestamp: Date;
 }
 
+const API_BASE_URL = window.location.origin;
+
 export default function AskPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -31,7 +33,7 @@ export default function AskPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,10 +44,12 @@ export default function AskPage() {
             content,
           })),
         }),
+        credentials: 'include',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response');
+        const errorText = await response.text();
+        throw new Error(`Failed to get response: ${response.status} ${response.statusText}\n${errorText}`);
       }
 
       const data = await response.json();

@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus } from "lucide-react";
 import EvaluationList from "@/components/dashboard/evaluations/EvaluationList";
-import EvaluationForm from "@/components/dashboard/evaluations/EvaluationForm";
+import { EvaluationForm } from "@/components/dashboard/evaluations/EvaluationForm";
 import ReportViewer from "@/components/dashboard/evaluations/ReportViewer";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -14,14 +14,14 @@ const EvaluationsPage = () => {
     string | null
   >(null);
   const [isReportViewerOpen, setIsReportViewerOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
   const handleNewEvaluation = () => {
     setIsFormOpen(true);
   };
 
   const handleFormSubmit = (values: any) => {
-    // In a real implementation, this would submit the form data to the server
-    console.log("Form submitted:", values);
+    console.log('Form submitted:', values);
     setIsFormOpen(false);
     setActiveTab("list");
   };
@@ -31,18 +31,17 @@ const EvaluationsPage = () => {
   };
 
   const handleViewEvaluation = (id: string) => {
+    console.log('View evaluation:', id);
     setSelectedEvaluationId(id);
     setActiveTab("details");
   };
 
   const handleViewReport = (id: string) => {
-    setSelectedEvaluationId(id);
-    setIsReportViewerOpen(true);
+    setSelectedReport(id);
   };
 
   const handleDownloadReport = (id: string) => {
-    // In a real implementation, this would download the report
-    console.log("Downloading report for evaluation:", id);
+    console.log('Download report:', id);
   };
 
   return (
@@ -68,6 +67,8 @@ const EvaluationsPage = () => {
             onViewEvaluation={handleViewEvaluation}
             onViewReport={handleViewReport}
             onDownloadReport={handleDownloadReport}
+            onSubmit={handleFormSubmit}
+            onCancel={handleFormCancel}
           />
         </TabsContent>
 
@@ -166,15 +167,15 @@ const EvaluationsPage = () => {
       {/* New Evaluation Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 my-4">
-          <EvaluationForm onSubmit={handleFormSubmit} />
+          <EvaluationForm onSubmit={handleFormSubmit} onCancel={handleFormCancel} />
         </DialogContent>
       </Dialog>
 
       {/* Report Viewer Dialog */}
-      <Dialog open={isReportViewerOpen} onOpenChange={setIsReportViewerOpen}>
+      <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
           <ReportViewer
-            reportId={selectedEvaluationId || undefined}
+            reportId={selectedReport || undefined}
             onApprove={(id) => {
               console.log("Report approved:", id);
               setIsReportViewerOpen(false);

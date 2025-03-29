@@ -40,11 +40,14 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import EvaluationForm from "@/components/dashboard/evaluations/EvaluationForm";
+import { EvaluationForm } from "@/components/dashboard/evaluations/EvaluationForm";
 
-interface OverviewProps {}
+interface OverviewProps {
+  onSubmit: (values: any) => void;
+  onCancel: () => void;
+}
 
-const Overview = ({}: OverviewProps) => {
+const Overview = ({ onSubmit, onCancel }: OverviewProps) => {
   const [activeSection, setActiveSection] = useState("summary");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const data = useOverviewData();

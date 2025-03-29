@@ -20,7 +20,12 @@ interface DocumentData {
   evaluation?: any;
 }
 
-export default function EvaluationForm() {
+interface EvaluationFormProps {
+  onSubmit: (values: any) => void;
+  onCancel?: () => void;
+}
+
+export function EvaluationForm({ onSubmit, onCancel }: EvaluationFormProps) {
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
@@ -207,8 +212,8 @@ export default function EvaluationForm() {
       )}
 
       <div className="flex justify-end gap-3">
-        <Button variant="outline">Cancel</Button>
-        <Button disabled={isProcessing || documents.length === 0}>
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button disabled={isProcessing || documents.length === 0} onClick={() => onSubmit(formData)}>
           {isProcessing ? 'Processing...' : 'Submit Evaluation'}
         </Button>
       </div>

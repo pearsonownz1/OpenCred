@@ -18,6 +18,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  MessageSquareText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -91,6 +92,11 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
       icon: <Award size={20} />,
       label: "Evaluations",
       path: "/dashboard/evaluations",
+    },
+    {
+      icon: <MessageSquareText size={20} />,
+      label: "Ask AI",
+      path: "/dashboard/ask",
     },
     {
       icon: <Settings size={20} />,

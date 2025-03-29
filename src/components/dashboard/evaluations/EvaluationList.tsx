@@ -28,7 +28,7 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
-import EvaluationForm from "./EvaluationForm";
+import { EvaluationForm } from './EvaluationForm';
 
 type EvaluationStatus = "pending" | "in-progress" | "completed" | "rejected";
 
@@ -70,6 +70,8 @@ interface EvaluationListProps {
   onViewEvaluation?: (id: string) => void;
   onViewReport?: (id: string) => void;
   onDownloadReport?: (id: string) => void;
+  onSubmit: (values: any) => void;
+  onCancel: () => void;
 }
 
 const EvaluationList = ({
@@ -77,6 +79,8 @@ const EvaluationList = ({
   onViewEvaluation = () => {},
   onViewReport = () => {},
   onDownloadReport = () => {},
+  onSubmit,
+  onCancel,
 }: EvaluationListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<EvaluationStatus | "all">(
