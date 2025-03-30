@@ -1,62 +1,90 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model Student {
-  id          String       @id @default(uuid())
-  name        String
-  email       String       @unique
-  evaluations Evaluation[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                 String               @id @default(uuid())
+  name               String
+  email              String               @unique
+  evaluationRequests EvaluationRequest[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 }
 
 model Document {
-  id           String     @id @default(uuid())
-  filename     String
-  originalName String
-  path         String
-  type         String
-  mimetype     String
-  size         Int
-  parsedData   Json?
-  evaluationId String
-  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id                  String             @id @default(uuid())
+  filename            String
+  originalName        String
+  path                String
+  type                DocumentType
+  mimetype            String
+  size                Int
+  parsedData          Json?
+  evaluationRequestId String?
+  evaluationRequest   EvaluationRequest? @relation(fields: [evaluationRequestId], references: [id])
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 }
 
-model Evaluation {
-  id             String     @id @default(uuid())
+model EvaluationRequest {
+  id             String            @id @default(uuid())
+  student        Student           @relation(fields: [studentId], references: [id])
   studentId      String
-  student        Student    @relation(fields: [studentId], references: [id])
-  status         String
+  documents      Document[]
+  status         RequestStatus
+  submittedAt    DateTime          @default(now())
   evaluationType String
   institution    String
-  country        String
+  country        CountryRules      @relation(fields: [countryCode], references: [country])
+  countryCode    String
   program        String
-  result         Json?
-  error          String?    // Store error message if evaluation fails
-  documents      Document[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  result         EvaluationResult?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}
+
+model EvaluationResult {
+  id             String            @id @default(uuid())
+  request        EvaluationRequest @relation(fields: [requestId], references: [id])
+  requestId      String            @unique
+  aiAnalysis     Json
+  humanReview    Json?
+  finalResult    Json?
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  reviewNotes    String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 }
 
 model CountryRules {
-  id        String   @id @default(uuid())
-  country   String   @unique
-  rules     String   // JSON string containing education system rules
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String              @id @default(uuid())
+  country            String              @unique
+  rules              String
+  evaluationRequests EvaluationRequest[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+enum RequestStatus {
+  SUBMITTED
+  AI_PROCESSING
+  HUMAN_REVIEW
+  COMPLETED
+  ERROR
+}
+
+enum DocumentType {
+  TRANSCRIPT
+  DIPLOMA
+  IDENTIFICATION
+  OTHER
 }
