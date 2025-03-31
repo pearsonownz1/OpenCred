@@ -5,87 +5,48 @@ import StudentForm from "@/components/dashboard/students/StudentForm";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users, X } from "lucide-react";
+import { useStudents } from "@/hooks/use-students";
 
 interface Student {
   id: string;
   name: string;
   email: string;
-  country: string;
-  program: string;
-  status: "Pending" | "In Progress" | "Completed";
-  lastUpdated: string;
+  createdAt: string;
+  updatedAt: string;
 }
+
+const StudentDetails = ({ studentId, onClose }: { studentId: string | undefined; onClose: () => void }) => {
+  const { data: student } = useStudents(studentId);
+
+  if (!student) return null;
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Student Details</h2>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="space-y-4">
+        <p><strong>Name:</strong> {student.name}</p>
+        <p><strong>Email:</strong> {student.email}</p>
+        <p><strong>Created At:</strong> {new Date(student.createdAt).toLocaleDateString()}</p>
+        <p><strong>Updated At:</strong> {new Date(student.updatedAt).toLocaleDateString()}</p>
+      </div>
+    </div>
+  );
+};
 
 const StudentsPage = () => {
   const navigate = useNavigate();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentStudentId, setCurrentStudentId] = useState<
-    string | undefined
-  >();
+  const [currentStudentId, setCurrentStudentId] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState("all");
-
-  // Mock students data
-  const [students, setStudents] = useState<Student[]>([
-    {
-      id: "1",
-      name: "John Smith",
-      email: "john.smith@example.com",
-      country: "India",
-      program: "Computer Science",
-      status: "In Progress",
-      lastUpdated: "2023-06-15",
-    },
-    {
-      id: "2",
-      name: "Maria Garcia",
-      email: "maria.garcia@example.com",
-      country: "Brazil",
-      program: "Business Administration",
-      status: "Completed",
-      lastUpdated: "2023-05-22",
-    },
-    {
-      id: "3",
-      name: "Ahmed Hassan",
-      email: "ahmed.hassan@example.com",
-      country: "Egypt",
-      program: "Medicine",
-      status: "Pending",
-      lastUpdated: "2023-06-10",
-    },
-    {
-      id: "4",
-      name: "Li Wei",
-      email: "li.wei@example.com",
-      country: "China",
-      program: "Engineering",
-      status: "In Progress",
-      lastUpdated: "2023-06-01",
-    },
-    {
-      id: "5",
-      name: "Sofia Petrov",
-      email: "sofia.petrov@example.com",
-      country: "Russia",
-      program: "Law",
-      status: "Pending",
-      lastUpdated: "2023-06-18",
-    },
-  ]);
-
-  // Filter students based on active tab
-  const filteredStudents =
-    activeTab === "all"
-      ? students
-      : students.filter((student) => {
-          if (activeTab === "pending") return student.status === "Pending";
-          if (activeTab === "inProgress")
-            return student.status === "In Progress";
-          if (activeTab === "completed") return student.status === "Completed";
-          return true;
-        });
+  const { data: students, isLoading } = useStudents();
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const handleAddStudent = () => {
     setIsEditMode(false);
@@ -100,53 +61,25 @@ const StudentsPage = () => {
   };
 
   const handleViewDetails = (id: string) => {
-    // In a real application, this would navigate to a detailed view
-    console.log(`View details for student ${id}`);
+    setCurrentStudentId(id);
+    setIsDetailsOpen(true);
   };
 
   const handleDeleteStudent = (id: string) => {
-    // In a real application, this would show a confirmation dialog
-    setStudents(students.filter((student) => student.id !== id));
+    console.log(`Delete student ${id}`);
   };
 
   const handleFormSubmit = (data: any) => {
-    // In a real application, this would send data to an API
     console.log("Form submitted:", data);
-
-    // Mock implementation for UI demonstration
-    if (isEditMode && currentStudentId) {
-      // Update existing student
-      setStudents(
-        students.map((student) =>
-          student.id === currentStudentId
-            ? {
-                ...student,
-                name: `${data.firstName} ${data.lastName}`,
-                email: data.email,
-                program: data.programOfStudy || student.program,
-              }
-            : student,
-        ),
-      );
-    } else {
-      // Add new student
-      const newStudent: Student = {
-        id: `${students.length + 1}`,
-        name: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-        country: data.nationality || "Not specified",
-        program: data.programOfStudy || "Not specified",
-        status: "Pending",
-        lastUpdated: new Date().toISOString().split("T")[0],
-      };
-      setStudents([...students, newStudent]);
-    }
-
     setIsFormOpen(false);
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="bg-gray-50 min-h-screen p-6">
+    <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center mb-6">
           <Button
@@ -168,42 +101,12 @@ const StudentsPage = () => {
             value={activeTab}
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid grid-cols-4 w-full max-w-md">
+            <TabsList className="grid w-full max-w-md">
               <TabsTrigger value="all">All Students</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="inProgress">In Progress</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-4">
               <StudentList
-                students={filteredStudents}
-                onAddStudent={handleAddStudent}
-                onEditStudent={handleEditStudent}
-                onViewDetails={handleViewDetails}
-                onDeleteStudent={handleDeleteStudent}
-              />
-            </TabsContent>
-            <TabsContent value="pending" className="mt-4">
-              <StudentList
-                students={filteredStudents}
-                onAddStudent={handleAddStudent}
-                onEditStudent={handleEditStudent}
-                onViewDetails={handleViewDetails}
-                onDeleteStudent={handleDeleteStudent}
-              />
-            </TabsContent>
-            <TabsContent value="inProgress" className="mt-4">
-              <StudentList
-                students={filteredStudents}
-                onAddStudent={handleAddStudent}
-                onEditStudent={handleEditStudent}
-                onViewDetails={handleViewDetails}
-                onDeleteStudent={handleDeleteStudent}
-              />
-            </TabsContent>
-            <TabsContent value="completed" className="mt-4">
-              <StudentList
-                students={filteredStudents}
+                students={students}
                 onAddStudent={handleAddStudent}
                 onEditStudent={handleEditStudent}
                 onViewDetails={handleViewDetails}
@@ -220,6 +123,15 @@ const StudentsPage = () => {
               isEdit={isEditMode}
               onSubmit={handleFormSubmit}
               onCancel={() => setIsFormOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+          <DialogContent className="max-w-2xl">
+            <StudentDetails
+              studentId={currentStudentId}
+              onClose={() => setIsDetailsOpen(false)}
             />
           </DialogContent>
         </Dialog>
