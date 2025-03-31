@@ -1,3 +1,4 @@
+// document processor
 import { createWorker } from 'tesseract.js';
 import pdfParse, { Options } from 'pdf-parse';
 import sharp from 'sharp';

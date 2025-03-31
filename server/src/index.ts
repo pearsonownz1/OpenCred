@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import documentsRouter from './routes/documents';
-import chatRouter from './routes/chat';
+import documentsRouter from './documents/routes';
+import chatRouter from './chat/routes';
 import path from 'path';
+import studentsRouter from './students/routes';
+import evaluationsRouter from './evaluations/routes';
 
 dotenv.config();
 
@@ -11,12 +13,7 @@ const app = express();
 const port = parseInt(process.env.PORT || '3001');
 
 // Enable CORS for development and production
-app.use(cors({
-  origin: process.env.NODE_ENV === 'development' 
-    ? ['http://localhost:5173', 'http://localhost:5174']
-    : ['https://openeval.co', 'https://www.openeval.co'],
-  credentials: true,
-}));
+app.use(cors());
 
 // Middleware
 app.use(express.json());
@@ -28,6 +25,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Routes
 app.use('/api/documents', documentsRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/students', studentsRouter);
+app.use('/api/evaluations', evaluationsRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
