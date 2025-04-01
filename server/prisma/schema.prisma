@@ -47,6 +47,7 @@ model EvaluationRequest {
   countryCode    String
   program        String
   result         EvaluationResult?
+  revisions      Revision[]
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 }
@@ -74,6 +75,19 @@ model CountryRules {
   updatedAt          DateTime            @updatedAt
 }
 
+model Revision {
+  id                  String            @id @default(uuid())
+  evaluationRequest   EvaluationRequest @relation(fields: [evaluationRequestId], references: [id])
+  evaluationRequestId String
+  requestedBy         String
+  requestedAt         DateTime          @default(now())
+  description         String
+  status              RevisionStatus    @default(PENDING)
+  completedAt         DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+}
+
 enum RequestStatus {
   SUBMITTED
   AI_PROCESSING
@@ -87,4 +101,10 @@ enum DocumentType {
   DIPLOMA
   IDENTIFICATION
   OTHER
+}
+
+enum RevisionStatus {
+  PENDING
+  COMPLETED
+  REJECTED
 }
