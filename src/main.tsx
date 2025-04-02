@@ -1,24 +1,23 @@
+// main.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { TempoDevtools } from "tempo-devtools";
-TempoDevtools.init();
-
-const basename = import.meta.env.BASE_URL;
-
-// Unregister any service workers
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    for(let registration of registrations) {
-      registration.unregister()
-    }
-  })
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 2,
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </React.StrictMode>
 );
