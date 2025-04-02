@@ -15,3 +15,10 @@ export const getEvaluationResultById = async (id: string) => {
         include: { request: true },
     });
 };
+
+
+export const getRevisionById = async (id: string) => {
+    return await prisma.revision.findUnique({
+        where: { id },
+    });
+};

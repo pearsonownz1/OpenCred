@@ -13,3 +13,9 @@ export const getAllEvaluationResults = async () => {
     include: { request: true },
   });
 };
+
+export const getAllRevisions = async () => {
+  return await prisma.revision.findMany({
+    include: { evaluationRequest: true },
+  });
+};

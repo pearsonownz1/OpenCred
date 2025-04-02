@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, RevisionStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -33,6 +33,41 @@ export const createOrUpdateEvaluationResult = async (
     create: {
       requestId,
       ...data,
+    },
+  });
+};
+
+export const createRevision = async (data: {
+  requestId: string;
+  status: RevisionStatus;
+  comments: string;
+}) => {
+  return await prisma.revision.create({
+    data: {
+      ...data,
+      requestedBy: 'SYSTEM',
+      description: 'Initial revision',
+      evaluationRequest: {
+        connect: { id: data.requestId },
+      },
+    },
+  });
+};
+
+export const createOrUpdateEvaluationRequest = async (id: string, data: {
+  studentId: string;
+  evaluationType: string;
+  institution: string;
+  countryCode: string;
+  program: string;
+}) => {
+  return await prisma.evaluationRequest.upsert({
+    where: { id },
+    update: data,
+    create: {
+      id,
+      ...data,
+      status: 'SUBMITTED',
     },
   });
 };
