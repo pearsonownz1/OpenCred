@@ -2,9 +2,11 @@ import express from 'express';
 import {
     getAllEvaluationRequests,
     getAllEvaluationResults,
+    getAllRevisions,
 } from './operations/list';
-import { createEvaluationRequest, createOrUpdateEvaluationResult } from './operations/create';
-import { getEvaluationRequestById, getEvaluationResultById } from './operations/get-by-id';
+import { createEvaluationRequest, createOrUpdateEvaluationResult, createRevision } from './operations/create';
+import { getEvaluationRequestById, getEvaluationResultById, getRevisionById } from './operations/get-by-id';
+import { updateRevisionStatus } from './operations/update';
 
 const router = express.Router();
 
@@ -71,6 +73,49 @@ router.put('/results/:requestId', async (req, res) => {
     } catch (error) {
         console.error('Error updating evaluation result:', error);
         res.status(500).json({ error: 'Failed to update evaluation result' });
+    }
+});
+
+router.get('/revisions', async (req, res) => {
+    try {
+        const revisions = await getAllRevisions();
+        res.json(revisions);
+    } catch (error) {
+        console.error('Error fetching revisions:', error);
+        res.status(500).json({ error: 'Failed to fetch revisions' });
+    }
+});
+
+router.get('/revisions/:id', async (req, res) => {
+    try {
+        const revision = await getRevisionById(req.params.id);
+        if (!revision) {
+            return res.status(404).json({ error: 'Revision not found' });
+        }
+        res.json(revision);
+    } catch (error) {
+        console.error('Error fetching revision:', error);
+        res.status(500).json({ error: 'Failed to fetch revision' });
+    }
+});
+
+router.post('/revisions', async (req, res) => {
+    try {
+        const revision = await createRevision(req.body);
+        res.status(201).json(revision);
+    } catch (error) {
+        console.error('Error creating revision:', error);
+        res.status(500).json({ error: 'Failed to create revision' });
+    }
+});
+
+router.put('/revisions/:id/status', async (req, res) => {
+    try {
+        const updatedRevision = await updateRevisionStatus(req.params.id, req.body.status);
+        res.json(updatedRevision);
+    } catch (error) {
+        console.error('Error updating revision status:', error);
+        res.status(500).json({ error: 'Failed to update revision status' });
     }
 });
 
