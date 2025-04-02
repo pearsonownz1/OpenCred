@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/home";
 import Dashboard from "./pages/dashboard";
+import AdminDashboard from "./pages/admin-dashboard";
 import Overview from "./components/dashboard/Overview";
 import StudentsPage from "./pages/dashboard/students";
 import DocumentsPage from "./pages/dashboard/documents";
@@ -32,6 +33,9 @@ export function AppRoutes() {
         <Route path="evaluations" element={<EvaluationsPage />} />
         <Route path="ask" element={<AskPage />} />
       </Route>
+      <Route path="/dashboard/admin" element={<AdminDashboard />}>
+        <Route index element={<Overview onSubmit={handleFormSubmit} onCancel={handleFormCancel} />} />
+      </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -40,4 +44,4 @@ export function AppRoutes() {
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
-} 
+}
