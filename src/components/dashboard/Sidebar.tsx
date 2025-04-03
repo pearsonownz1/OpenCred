@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import {
@@ -21,6 +21,7 @@ import {
   MessageSquareText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -28,6 +29,7 @@ interface NavItemProps {
   path: string;
   isActive: boolean;
   isCollapsed: boolean;
+  onClick?: () => void;
 }
 
 const NavItem = ({
@@ -36,31 +38,42 @@ const NavItem = ({
   path,
   isActive,
   isCollapsed,
+  onClick,
 }: NavItemProps) => {
-  return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link to={path}>
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full justify-start gap-3 px-3 py-2 h-10 text-white/80",
-                isActive
-                  ? "bg-white/10 text-white"
-                  : "hover:bg-white/10 hover:text-white",
-                isCollapsed && "justify-center px-2",
-              )}
-            >
-              {icon}
-              {!isCollapsed && <span>{label}</span>}
-            </Button>
-          </Link>
-        </TooltipTrigger>
-        {isCollapsed && <TooltipContent side="right">{label}</TooltipContent>}
-      </Tooltip>
-    </TooltipProvider>
+  const content = (
+    <div
+      className={cn(
+        "group flex items-center rounded-lg px-3 py-2 hover:bg-accent",
+        isActive && "bg-accent"
+      )}
+      onClick={onClick}
+    >
+      <div
+        className={cn(
+          "flex h-6 w-6 items-center justify-center",
+          isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+        )}
+      >
+        {icon}
+      </div>
+      {!isCollapsed && (
+        <span
+          className={cn(
+            "ml-3",
+            isActive ? "font-medium text-foreground" : "text-muted-foreground group-hover:text-foreground"
+          )}
+        >
+          {label}
+        </span>
+      )}
+    </div>
   );
+
+  if (onClick) {
+    return content;
+  }
+
+  return <Link to={path}>{content}</Link>;
 };
 
 interface SidebarProps {
@@ -70,66 +83,148 @@ interface SidebarProps {
 const Sidebar = ({ className = "" }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
-  const currentPath = location.pathname;
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   const navItems = [
     {
-      icon: <LayoutDashboard size={20} />,
-      label: "Dashboard",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+      label: "Overview",
       path: "/dashboard",
     },
     {
-      icon: <Users size={20} />,
+      icon: <Users className="h-5 w-5" />,
       label: "Students",
       path: "/dashboard/students",
     },
     {
-      icon: <FileText size={20} />,
+      icon: <FileText className="h-5 w-5" />,
       label: "Documents",
       path: "/dashboard/documents",
     },
     {
-      icon: <Award size={20} />,
+      icon: <Award className="h-5 w-5" />,
       label: "Evaluations",
       path: "/dashboard/evaluations",
     },
     {
-      icon: <MessageSquareText size={20} />,
-      label: "Ask AI",
+      icon: <MessageSquareText className="h-5 w-5" />,
+      label: "Ask",
       path: "/dashboard/ask",
-    },
-    {
-      icon: <Settings size={20} />,
-      label: "Settings",
-      path: "/dashboard/settings",
-    },
-    {
-      icon: <HelpCircle size={20} />,
-      label: "Help & Resources",
-      path: "/dashboard/help",
     },
   ];
 
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
   return (
-    <div
+    <aside
       className={cn(
-        "flex flex-col h-screen bg-primary border-r border-white/10 transition-all duration-300",
-        isCollapsed ? "w-[60px]" : "w-[220px]"
+        "flex h-screen flex-col border-r border-border bg-background transition-all",
+        isCollapsed ? "w-[4.5rem]" : "w-64",
+        className
       )}
     >
-      <div className="flex items-center justify-between p-3">
-        <Link to="/dashboard" className="flex items-center">
-          <Logo className={cn("text-white", isCollapsed ? "scale-75" : "")} />
+      <div className="flex h-20 items-center border-b border-border px-4">
+        <Link to="/" className="flex items-center gap-2">
+          <Logo className="h-8 w-8" />
+          {!isCollapsed && <span className="font-semibold">OpenEval</span>}
         </Link>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4">
+        <nav className="flex flex-col gap-1">
+          {navItems.map((item) => (
+            <TooltipProvider key={item.path} delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <NavItem
+                      {...item}
+                      isActive={location.pathname === item.path}
+                      isCollapsed={isCollapsed}
+                    />
+                  </div>
+                </TooltipTrigger>
+                {isCollapsed && (
+                  <TooltipContent side="right">
+                    {item.label}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </nav>
+      </div>
+
+      <div className="border-t border-border p-4">
+        <nav className="flex flex-col gap-1">
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <NavItem
+                    icon={<Settings className="h-5 w-5" />}
+                    label="Settings"
+                    path="/settings"
+                    isActive={location.pathname === "/settings"}
+                    isCollapsed={isCollapsed}
+                  />
+                </div>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right">Settings</TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <NavItem
+                    icon={<HelpCircle className="h-5 w-5" />}
+                    label="Help"
+                    path="/help"
+                    isActive={location.pathname === "/help"}
+                    isCollapsed={isCollapsed}
+                  />
+                </div>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right">Help</TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <NavItem
+                    icon={<LogOut className="h-5 w-5" />}
+                    label="Sign Out"
+                    path=""
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={handleSignOut}
+                  />
+                </div>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right">Sign Out</TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+        </nav>
+
         <Button
           variant="ghost"
           size="icon"
-          className="text-white hover:bg-white/10"
-          onClick={toggleCollapse}
+          className="mt-2 w-full"
+          onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -138,45 +233,7 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
           )}
         </Button>
       </div>
-
-      <nav className="flex-1 py-2 px-2 space-y-1 overflow-y-auto">
-        {navItems.map((item) => (
-          <NavItem
-            key={item.path}
-            icon={item.icon}
-            label={item.label}
-            path={item.path}
-            isActive={
-              currentPath === item.path ||
-              currentPath.startsWith(`${item.path}/`)
-            }
-            isCollapsed={isCollapsed}
-          />
-        ))}
-      </nav>
-
-      <div className="p-2 border-t border-white/10">
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start gap-3 text-white/80 hover:text-white hover:bg-white/10",
-                  isCollapsed && "justify-center px-2",
-                )}
-              >
-                <LogOut size={20} />
-                {!isCollapsed && <span>Sign Out</span>}
-              </Button>
-            </TooltipTrigger>
-            {isCollapsed && (
-              <TooltipContent side="right">Sign Out</TooltipContent>
-            )}
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-    </div>
+    </aside>
   );
 };
 

@@ -1,37 +1,10 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Header from "@/components/dashboard/Header";
+import { useLocation } from "react-router-dom";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
-interface DashboardProps {
-  userName?: string;
-  userEmail?: string;
-  userAvatar?: string;
-  notificationCount?: number;
+export default function Dashboard() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/dashboard/admin");
+
+  return <DashboardLayout isAdmin={isAdmin} />;
 }
-
-const Dashboard = ({
-  userName = "John Doe",
-  userEmail = "john.doe@university.edu",
-  userAvatar = "",
-  notificationCount = 3,
-}: DashboardProps) => {
-  return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      <div className="flex flex-col flex-1">
-        <Header
-          userName={userName}
-          userEmail={userEmail}
-          userAvatar={userAvatar}
-          notificationCount={notificationCount}
-        />
-        <main className="flex-1 overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
