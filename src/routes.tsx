@@ -14,6 +14,7 @@ import ForgotPasswordPage from "./pages/auth/ForgotPassword";
 import ResetPasswordPage from "./pages/auth/ResetPassword";
 import VerifyEmailPage from "./pages/auth/VerifyEmail";
 import NotFoundPage from "./pages/NotFound";
+import ErrorPage from "./pages/Error";
 import { UserProvider } from "./providers/use-provider";
 
 const handleFormSubmit = (values: any) => {
@@ -28,23 +29,23 @@ export function AppRoutes() {
   return (
     <UserProvider>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />}>
+        <Route path="/" element={<Home />} errorElement={<ErrorPage />} />
+        <Route path="/dashboard" element={<Dashboard />} errorElement={<ErrorPage />}>
           <Route index element={<Overview onSubmit={handleFormSubmit} onCancel={handleFormCancel} />} />
           <Route path="students" element={<StudentsPage />} />
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="evaluations" element={<EvaluationsPage />} />
           <Route path="ask" element={<AskPage />} />
         </Route>
-        <Route path="/dashboard/admin" element={<AdminDashboard />}>
+        <Route path="/dashboard/admin" element={<AdminDashboard />} errorElement={<ErrorPage />}>
           <Route index element={<Overview onSubmit={handleFormSubmit} onCancel={handleFormCancel} />} />
         </Route>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/login" element={<LoginPage />} errorElement={<ErrorPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} errorElement={<ErrorPage />} />
+        <Route path="/register" element={<RegisterPage />} errorElement={<ErrorPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} errorElement={<ErrorPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} errorElement={<ErrorPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} errorElement={<ErrorPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </UserProvider>

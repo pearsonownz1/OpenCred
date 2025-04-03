@@ -80,7 +80,7 @@ const StudentsPage = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div>
         <div className="flex items-center mb-6">
           <Button
             variant="ghost"
