@@ -120,7 +120,6 @@ export function AppSidebar({ isAdmin = false }: AppSidebarProps) {
         <div className="bg-blue-600 rounded-md w-8 h-8 flex items-center justify-center">
           <span className="font-bold text-white">O</span>
         </div>
-        <span className="font-bold text-xl text-white">OpenEval</span>
       </SidebarHeader>
 
       <SidebarContent>
