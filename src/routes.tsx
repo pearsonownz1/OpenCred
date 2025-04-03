@@ -1,4 +1,4 @@
-import { Routes, Route, useRoutes } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import { UserProvider } from "./providers/use-provider";
 import { appRoutes } from "./config/routes";
 

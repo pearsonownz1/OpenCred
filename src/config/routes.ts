@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom"
-import React, { type ReactElement, type ComponentType, type PropsWithChildren } from "react"
+import React, { type ReactElement, type ComponentType } from "react"
 import Home from "@/components/home"
 import Dashboard from "@/pages/dashboard"
 import AdminDashboard from "@/pages/admin-dashboard"
@@ -7,6 +7,8 @@ import Overview from "@/components/dashboard/Overview"
 import StudentsPage from "@/pages/dashboard/students"
 import DocumentsPage from "@/pages/dashboard/documents"
 import EvaluationsPage from "@/pages/dashboard/evaluations"
+import EvaluationDetailPage from "@/pages/dashboard/evaluation-details"
+import NewEvaluationRequestPage from "@/pages/dashboard/new-evaluation"
 import AskPage from "@/pages/dashboard/ask"
 import SettingsPage from "@/pages/dashboard/settings"
 import LoginPage from "@/pages/auth/Login"
@@ -64,12 +66,40 @@ export const dashboardRoutes: RouteObject[] = [
     ...createRoute(EvaluationsPage),
   },
   {
+    path: "evaluations/requests/new",
+    ...createRoute(NewEvaluationRequestPage),
+  },
+  {
+    path: "evaluations/:id",
+    ...createRoute(EvaluationDetailPage),
+  },
+  {
     path: "ask",
     ...createRoute(AskPage),
   },
   {
     path: "settings",
     ...createRoute(SettingsPage),
+  },
+]
+
+// Admin dashboard routes with the same evaluation management features
+export const adminDashboardRoutes: RouteObject[] = [
+  {
+    index: true,
+    ...createRoute<FormProps>(Overview, { onSubmit: handleFormSubmit, onCancel: handleFormCancel }),
+  },
+  {
+    path: "evaluations",
+    ...createRoute(EvaluationsPage),
+  },
+  {
+    path: "evaluations/requests/new",
+    ...createRoute(NewEvaluationRequestPage),
+  },
+  {
+    path: "evaluations/:id",
+    ...createRoute(EvaluationDetailPage),
   },
 ]
 
@@ -122,12 +152,7 @@ export const appRoutes: RouteObject[] = [
     path: "/dashboard/admin",
     ...createRoute(AdminDashboard),
     errorElement: createErrorElement(),
-    children: [
-      {
-        index: true,
-        ...createRoute<FormProps>(Overview, { onSubmit: handleFormSubmit, onCancel: handleFormCancel }),
-      },
-    ],
+    children: adminDashboardRoutes,
   },
   ...authRoutes,
   {

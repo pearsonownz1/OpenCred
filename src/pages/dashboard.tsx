@@ -1,20 +1,10 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Header } from "@/components/layout/Header";
+import { useLocation } from "react-router-dom";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
-const Dashboard = () => {
-  return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto bg-[#F8FAFC] p-4">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
-};
+export default function Dashboard() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/dashboard/admin");
 
-export default Dashboard;
+  return <DashboardLayout isAdmin={isAdmin} />;
+}
