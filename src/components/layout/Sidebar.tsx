@@ -18,6 +18,7 @@ interface NavItem {
   title: string;
   href: string;
   icon: React.ElementType;
+  items?: { title: string; href: string }[];
 }
 
 interface SidebarProps {
@@ -55,21 +56,15 @@ export function Sidebar({ isAdmin = false }: SidebarProps) {
       title: "Evaluations",
       href: "/dashboard/evaluations",
       icon: ClipboardCheck,
+      items: [
+        { title: "All Evaluations", href: "/dashboard/evaluations" },
+        { title: "New Evaluation", href: "/dashboard/evaluations/new" },
+      ],
     },
     {
       title: "Ask AI",
       href: "/dashboard/ask",
       icon: MessageSquareText,
-    },
-    {
-      title: "Settings",
-      href: "/dashboard/settings",
-      icon: Settings,
-    },
-    {
-      title: "Help & Resources",
-      href: "/dashboard/help",
-      icon: HelpCircle,
     },
   ];
 
@@ -83,6 +78,19 @@ export function Sidebar({ isAdmin = false }: SidebarProps) {
       title: "Evaluation Requests",
       href: "/dashboard/admin/requests",
       icon: ClipboardCheck,
+    },
+  ];
+
+  const footerItems: NavItem[] = [
+    {
+      title: "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
+    },
+    {
+      title: "Help & Resources",
+      href: "/dashboard/help",
+      icon: HelpCircle,
     },
   ];
 
@@ -116,7 +124,8 @@ export function Sidebar({ isAdmin = false }: SidebarProps) {
               <Link
                 to={item.href}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                  location.pathname === item.href
+                  location.pathname === item.href ||
+                  location.pathname.startsWith(`${item.href}/`)
                     ? "bg-white/10 text-white"
                     : "text-white/60 hover:text-white hover:bg-white/5"
                 }`}
@@ -124,6 +133,24 @@ export function Sidebar({ isAdmin = false }: SidebarProps) {
                 <item.icon className="h-5 w-5 flex-shrink-0" />
                 {!isCollapsed && <span>{item.title}</span>}
               </Link>
+              {!isCollapsed && item.items && (
+                <ul className="mt-1 ml-9 space-y-1">
+                  {item.items.map((subItem) => (
+                    <li key={subItem.href}>
+                      <Link
+                        to={subItem.href}
+                        className={`block py-2 px-3 rounded-md text-sm transition-colors ${
+                          location.pathname === subItem.href
+                            ? "text-white bg-white/10"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        {subItem.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
 
@@ -159,14 +186,33 @@ export function Sidebar({ isAdmin = false }: SidebarProps) {
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-white/10">
-        <button
-          onClick={handleSignOut}
-          className="flex w-full items-center gap-3 px-3 py-2 text-white/60 hover:text-white rounded-md transition-colors hover:bg-white/5"
-        >
-          <LogOut className="h-5 w-5" />
-          {!isCollapsed && <span>Sign Out</span>}
-        </button>
+      <div className="mt-auto border-t border-white/10">
+        <ul className="px-2 py-4 space-y-1">
+          {footerItems.map((item) => (
+            <li key={item.href}>
+              <Link
+                to={item.href}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+                  location.pathname === item.href
+                    ? "bg-white/10 text-white"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                {!isCollapsed && <span>{item.title}</span>}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <button
+              onClick={handleSignOut}
+              className="flex w-full items-center gap-3 px-3 py-2 text-white/60 hover:text-white rounded-md transition-colors hover:bg-white/5"
+            >
+              <LogOut className="h-5 w-5" />
+              {!isCollapsed && <span>Sign Out</span>}
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
   );
