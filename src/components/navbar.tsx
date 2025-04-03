@@ -1,17 +1,20 @@
 "use client"
 
 import React from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Menu, X, LogIn, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { smoothScrollTo } from "@/lib/smooth-scroll"
+import { useAuth } from "@/hooks/use-auth"
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
+  const { user, loading } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,6 +61,15 @@ export function Navbar() {
     setIsMenuOpen(false)
     setActiveSection(id)
     smoothScrollTo(id)
+  }
+
+  const handleGetStarted = () => {
+    if (loading) return;
+    if (user) {
+      navigate("/dashboard")
+    } else {
+      navigate("/login", { state: { from: "/dashboard" } })
+    }
   }
 
   return (
@@ -158,19 +170,29 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" asChild className="hidden md:flex items-center gap-1.5">
-            <RouterLink to="/login">
-              <LogIn className="h-4 w-4" />
-              Log In
-            </RouterLink>
-          </Button>
-          <Button size="sm" className="hidden md:flex items-center gap-1.5" asChild>
-            <RouterLink to="/dashboard">
-              <ArrowRight className="h-4 w-4" />
-              Get Started
-            </RouterLink>
-          </Button>
-
+          {!loading && (
+            !user ? (
+              <>
+                <Button variant="outline" size="sm" asChild className="hidden md:flex items-center gap-1.5">
+                  <RouterLink to="/login">
+                    <LogIn className="h-4 w-4" />
+                    Log In
+                  </RouterLink>
+                </Button>
+                <Button size="sm" className="hidden md:flex items-center gap-1.5" onClick={handleGetStarted}>
+                  <ArrowRight className="h-4 w-4" />
+                  Get Started
+                </Button>
+              </>
+            ) : (
+              <Button size="sm" className="hidden md:flex items-center gap-1.5" asChild>
+                <RouterLink to="/dashboard">
+                  <ArrowRight className="h-4 w-4" />
+                  Dashboard
+                </RouterLink>
+              </Button>
+            )
+          )}
           <button className="flex md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -203,18 +225,32 @@ export function Navbar() {
               FAQ
             </RouterLink>
             <div className="flex flex-col gap-3 pt-2 border-t mt-2">
-              <Button variant="outline" className="w-full flex items-center justify-center gap-1.5" asChild>
-                <RouterLink to="/auth/login" onClick={() => setIsMenuOpen(false)}>
-                  <LogIn className="h-4 w-4" />
-                  Log In
-                </RouterLink>
-              </Button>
-              <Button className="w-full flex items-center justify-center gap-1.5" asChild>
-                <RouterLink to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                  <ArrowRight className="h-4 w-4" />
-                  Get Started
-                </RouterLink>
-              </Button>
+              {!loading && (
+                !user ? (
+                  <>
+                    <Button variant="outline" className="w-full flex items-center justify-center gap-1.5" asChild>
+                      <RouterLink to="/login" onClick={() => setIsMenuOpen(false)}>
+                        <LogIn className="h-4 w-4" />
+                        Log In
+                      </RouterLink>
+                    </Button>
+                    <Button className="w-full flex items-center justify-center gap-1.5" onClick={() => {
+                      setIsMenuOpen(false)
+                      handleGetStarted()
+                    }}>
+                      <ArrowRight className="h-4 w-4" />
+                      Get Started
+                    </Button>
+                  </>
+                ) : (
+                  <Button className="w-full flex items-center justify-center gap-1.5" asChild>
+                    <RouterLink to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                      <ArrowRight className="h-4 w-4" />
+                      Dashboard
+                    </RouterLink>
+                  </Button>
+                )
+              )}
             </div>
           </nav>
         </motion.div>

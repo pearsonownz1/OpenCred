@@ -1,10 +1,11 @@
 import React from "react";
 import { LoginForm } from "@/components/auth/LoginForm";
+import AuthLayout from "@/components/auth/AuthLayout";
 
 export default function AdminLoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <AuthLayout>
       <LoginForm isAdmin={true} />
-    </div>
+    </AuthLayout>
   );
 }
