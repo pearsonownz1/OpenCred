@@ -59,7 +59,7 @@ const Overview = ({ onSubmit, onCancel }: OverviewProps) => {
   };
 
   return (
-    <div className="p-6">
+    <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Dashboard Overview</h1>
         <div className="flex space-x-2">
