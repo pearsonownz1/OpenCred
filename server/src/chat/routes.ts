@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { messages } = req.body;
-    const content = await createChatCompletion(messages);
+    const { messages, provider } = req.body;
+    const content = await createChatCompletion(messages, provider);
     res.json({ content });
   } catch (error) {
     console.error('Chat error:', error);
