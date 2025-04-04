@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
-import { supabaseServiceKey, supabaseUrl } from '../config'
+import { supabaseServiceKey, supabaseUrl } from '../config';
+
+console.log(supabaseServiceKey, supabaseUrl);
 
 
 

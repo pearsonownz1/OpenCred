@@ -28,7 +28,18 @@ export const getDocumentsByEvaluationRequest = async (evaluationRequestId: strin
 
 export const getAllDocuments = async () => {
   return prisma.document.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { evaluationRequest: true },
+    select: {
+      id: true,
+      filename: true,
+      originalName: true,
+      path: true,
+      // type: true, // Exclude the problematic field temporarily
+      mimetype: true,
+      size: true,
+      parsedData: true,
+      evaluationRequestId: true,
+      createdAt: true,
+      updatedAt: true
+    }
   });
 };

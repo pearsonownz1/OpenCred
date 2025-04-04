@@ -2,10 +2,32 @@ import express from 'express';
 import { parseDocument, getDocumentsByEvaluationRequest, getAllDocuments } from './operations/list';
 import { uploadDocument, evaluateDocument } from './operations/create';
 import { deleteDocument } from './operations/delete';
+import path from 'path';
+
+import multer from 'multer';
+
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../../uploads'));
+  },
+  filename: (req, file, cb) => {
+    // Create unique filename with original extension
+    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+// Create the multer instance
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
+
 
 const router = express.Router();
 
-router.post('/upload', async (req, res) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
