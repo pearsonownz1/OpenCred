@@ -42,12 +42,14 @@ export const useSendMessage = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ messages, conversationId }: { messages: Message[], conversationId: string }) => {
-      // Important: Format messages for the API 
-      // (no timestamps since the API doesn't expect them)
+    mutationFn: async ({ messages, conversationId, provider = 'gemini' }: { messages: Message[], conversationId: string, provider?: string }) => {
+      // Format messages for the API (no timestamps)
       const apiMessages = messages.map(({ role, content }) => ({ role, content }));
       
-      const { data } = await axios.post<ChatResponse>(CHAT_API_URL, { messages: apiMessages });
+      const { data } = await axios.post<ChatResponse>(CHAT_API_URL, { 
+        messages: apiMessages,
+        provider
+      });
       return { content: data.content, conversationId };
     },
     onSuccess: (data, variables) => {

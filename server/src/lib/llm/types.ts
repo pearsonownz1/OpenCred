@@ -8,7 +8,7 @@ export interface LLMClient {
     getProvider(): LLMProvider;
 }
 
-export type LLMProvider = 'openai' | 'gemini';
+export type LLMProvider = 'openai' | 'gemini' | 'gemini-2.0-flash';
 
 
 export type MessageRole = 'user' | 'assistant' | 'system';
