@@ -24,7 +24,7 @@ model Document {
   filename            String
   originalName        String
   path                String
-  type                DocumentType
+  type                DocumentType? @default(OTHER)
   mimetype            String
   size                Int
   parsedData          Json?

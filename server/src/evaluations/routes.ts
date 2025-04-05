@@ -7,8 +7,33 @@ import {
 import { createEvaluationRequest, createOrUpdateEvaluationResult, createRevision } from './operations/create';
 import { getEvaluationRequestById, getEvaluationResultById, getRevisionById } from './operations/get-by-id';
 import { updateRevisionStatus } from './operations/update';
+import { evaluateCredentials } from './operations/create';
 
 const router = express.Router();
+
+
+router.post('/evaluate', async (req, res) => {
+    try {
+      const evaluationData = req.body;
+      const { provider } = req.body;
+      
+      // Basic validation
+      if (!evaluationData.studentId || !evaluationData.sourceCountry || 
+          !evaluationData.program || !evaluationData.institution || 
+          !evaluationData.evaluationType) {
+        return res.status(400).json({ error: 'Missing required evaluation fields' });
+      }
+      
+      const result = await evaluateCredentials(evaluationData, provider);
+      res.json(result);
+    } catch (error) {
+      console.error('Evaluation error:', error);
+      res.status(500).json({
+        error: 'Failed to process evaluation request',
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
 
 router.get('/requests', async (req, res) => {
     try {

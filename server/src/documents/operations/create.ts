@@ -1,21 +1,23 @@
 import { PrismaClient, DocumentType, RequestStatus } from '@prisma/client';
-import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { processDocument } from '../../services/documentProcessor';
 import { evaluateCredentials } from '../../services/evaluationRules';
+// import { supabase } from '../../lib/supabase';
 
 const prisma = new PrismaClient();
 
 export const uploadDocument = async (file: Express.Multer.File, evaluationRequestId?: string) => {
-  const uploadsDir = path.join(process.cwd(), 'uploads');
-  await fs.mkdir(uploadsDir, { recursive: true });
-
   const uniqueId = uuidv4();
   const filename = uniqueId + path.extname(file.originalname);
-  const filePath = path.join(uploadsDir, filename);
 
-  await fs.writeFile(filePath, file.buffer);
+  // const { data, error } = await supabase.storage
+  //   .from('documents')
+  //   .upload(filename, file.buffer, {
+  //     contentType: file.mimetype,
+  //   });
+
+  // if (error) throw new Error(`Failed to upload file: ${error.message}`);
 
   let evaluationRequest = evaluationRequestId 
     ? await prisma.evaluationRequest.findUnique({ where: { id: evaluationRequestId } }) 
@@ -40,7 +42,7 @@ export const uploadDocument = async (file: Express.Multer.File, evaluationReques
       originalName: file.originalname,
       size: file.size,
       mimetype: file.mimetype,
-      path: `/uploads/${filename}`,
+      path: data?.path || '',
       type: DocumentType.OTHER,
       evaluationRequestId: evaluationRequest.id,
     },
@@ -68,7 +70,13 @@ export const evaluateDocument = async (documentId: string, documentType: Documen
 
   let parsedData = document.parsedData as any;
   if (!parsedData || !parsedData.extractedData) {
-    const processedData = await processDocument(document.path, documentType);
+    const { data, error } = await supabase.storage
+      .from('documents')
+      .download(document.path);
+
+    if (error) throw new Error(`Failed to download file: ${error.message}`);
+
+    const processedData = await processDocument(await data.arrayBuffer(), documentType);
     await prisma.document.update({
       where: { id: documentId },
       data: { parsedData: processedData }

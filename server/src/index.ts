@@ -7,6 +7,7 @@ import path from 'path';
 import studentsRouter from './students/routes';
 import evaluationsRouter from './evaluations/routes';
 
+
 dotenv.config();
 
 const app = express();
